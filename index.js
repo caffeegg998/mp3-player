@@ -1,9 +1,9 @@
 const jsmediatags = window.jsmediatags;
 
 function parseMp3Metadata(files) {
-    var parseMp3Metadata = []
+    var parseMp3Metadata1 = []
     var jsonString
-    files.map(function(file){ //parse Metadata
+    var cc = files.map(function(file){ //parse Metadata
         jsmediatags.read(file, {
             onSuccess: function (tag) {
                 
@@ -21,10 +21,11 @@ function parseMp3Metadata(files) {
                         genre : tag.tags.genre,
                         cover : `url(data:${format};base64,${window.btoa(base64String)})`
                     } 
-                    parseMp3Metadata.splice(0,0,arrs)
-                    renderMetadata(parseMp3Metadata)
-                    jsonString = JSON.stringify(parseMp3Metadata);
-                    // console.log(jsonString)
+                    parseMp3Metadata1.splice(0,0,arrs)
+                    return parseMp3Metadata1
+                    // renderMetadata(parseMp3Metadata)
+                    // jsonString = JSON.stringify(parseMp3Metadata);
+                    // // console.log(jsonString)
                     
                     
             },
@@ -33,6 +34,8 @@ function parseMp3Metadata(files) {
             }
         })
     })
+    console.log(parseMp3Metadata1)
+    renderMetadata(parseMp3Metadata1)
 
 }
 function downloadJson(content, fileName, contentType) {
@@ -80,20 +83,20 @@ function whenYouInputFile(){
         parseMp3Metadata(arrFile) //to parseMetadata
 
         // Convert and put file into arr
-        const arrBlob = []
-        var reader = new FileReader();
-        for(var i = 0; i<file.length;i++)
-        {
-            reader.readAsDataURL(arrFile[i]) // truyền vào file đầu vào cho sự kiện onload convert file sang url
-            reader.onload = function(evt){
-            url = evt.target.result;        
-            // console.log(url)
-            var arr = {   // gán url đã convert đầu tiên vào object này
-                path:url
-            }
-            arrBlob.push(arr) // gán từng object đc lặp theo số file được chọn vào mảng arrBlob
-            }  
-        }
+        // const arrBlob = []
+        // var reader = new FileReader();
+        // for(var i = 0; i<file.length;i++)
+        // {
+        //     reader.readAsDataURL(arrFile[i]) // truyền vào file đầu vào cho sự kiện onload convert file sang url
+        //     reader.onload = function(evt){
+        //     url = evt.target.result;        
+        //     // console.log(url)
+        //     var arr = {   // gán url đã convert đầu tiên vào object này
+        //         path:url
+        //     }
+        //     arrBlob.push(arr) // gán từng object đc lặp theo số file được chọn vào mảng arrBlob
+        //     }  
+        // }
         
         //         arrBlob = {         
         //                 cc: url,
