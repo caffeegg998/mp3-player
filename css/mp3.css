@@ -38,28 +38,56 @@
   
   .dashboard {
     padding: 16px 16px 14px;
-    background-color: #fff;
+    background-color: white;
     position: fixed;
     top: 0;
     width: 100%;
     max-width: 480px;
     border-bottom: 1px solid #ebebeb;
+    
+  }
+  .dashboard-blur {
+    padding: 16px 16px 14px;
+    top: 0;
+    left: 0;
+    background-blend-mode: screen;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    filter: blur(12px);
+    opacity: 60%;
+    height: 400px;
+    position: absolute;
+    width: 480px;
+  }
+  .dashboard-black{
+    padding: 16px 16px 14px;
+    top: 0;
+    left: 0;
+    background-color: black;
+    height: 400px;
+    position: absolute;
+    width: 480px;
   }
   
   /* HEADER */
   header {
     text-align: center;
     margin-bottom: 10px;
+    z-index: 1;
+    position: relative;
   }
   
   header h4 {
     color: var(--primary-color);
     font-size: 12px;
+    z-index: 1;
   }
   
   header h2 {
-    color: var(--text-color);
+    color: white;
     font-size: 20px;
+    z-index: 1;
   }
   
   /* CD */
@@ -76,6 +104,7 @@
     background-color: #333;
     background-size: cover;
     margin: auto;
+    z-index: 1;
   }
   
   /* CONTROL */
@@ -90,7 +119,21 @@
     color: #666;
     padding: 18px;
     font-size: 18px;
+    z-index: 999;
   }
+  .control .btn-next{
+    color: #666;
+    padding: 18px;
+    font-size: 18px;
+    z-index: 999;
+  }
+  .control .btn-next:hover{
+    color: var(--primary-color);
+  }
+  .control .btn-prev:hover{
+    color: var(--primary-color);
+  }
+  
   
   .control .btn.active {
     color: var(--primary-color);
@@ -132,6 +175,9 @@
   .playlist {
     margin-top: 408px;
     padding: 12px;
+    z-index: 3;
+    position: relative;
+    background-color: whitesmoke;
   }
   
   .song {

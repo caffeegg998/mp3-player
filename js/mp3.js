@@ -4,7 +4,11 @@ var btnPrev = document.querySelector('.btn-prev')
 
 function getIndexSong(arrSong,i){
     var arrGetIndex = []
-    arrGetIndex=arrSong
+    setTimeout(function(){
+        arrGetIndex=arrSong
+        console.log(arrGetIndex)
+    },2000)
+    console.log(arrGetIndex)
     var i = 0
 
     btnNext.onclick = function(){
@@ -13,20 +17,27 @@ function getIndexSong(arrSong,i){
         {
             return i=0
         }
-        currentSong(arrGetIndex[i-1])
+        currentSong(arrGetIndex[i])
+        console.log(i)
     }
     btnPrev.onclick = function(){
         i-- 
-        currentSong(arrGetIndex[i+1])
+        if(i<0)
+        {
+            i = arrGetIndex.length -1
+        }
+        currentSong(arrGetIndex[i])
+        console.log(i)
     }
 }
 
 function currentSong(current){
     var heading = document.querySelector('header h2')
     var cdThumb = document.querySelector('.cd-thumb')
+    var backgroundImage = document.querySelector('.dashboard-blur')
     var audio = document.querySelector('#audio')
     console.log(heading,cdThumb,audio)
-
+    backgroundImage.style.backgroundImage = current.cover
     heading.textContent = current.title
     cdThumb.style.backgroundImage =  current.cover
 }
@@ -100,14 +111,32 @@ function whenYouInputFile(){
 // End parseMp3, render playList 
 function handleEvents(){
     const cd = document.querySelector('.cd')
-        const cdWidth = cd.offsetWidth 
-        document.onscroll = function(){
-            const scrollTop = window.scrollY || document.documentElement.scrollTop
-            const newCdWidth = cdWidth - scrollTop
-            cd.style.width = newCdWidth > 0 ? newCdWidth + 'px' : 0; 
-            cd.style.opacity = newCdWidth / cdWidth
-            console.log(newCdWidth)
-        }
+    const backgroundBlur = document.querySelector('.dashboard-blur')
+    const backgroundBlack = document.querySelector('.dashboard-black')
+    const cdWidth = cd.offsetWidth 
+    const backgroundBlurWidth = backgroundBlur.offsetWidth 
+    const backgroundBlackWidth = backgroundBlack.offsetWidth 
+    
+    document.onscroll = function(){
+        const scrollTop = window.scrollY || document.documentElement.scrollTop
+        
+        // console.log("scroll: ",scrollTop)
+        
+        const newCdWidth = cdWidth - scrollTop
+        cd.style.width = newCdWidth > 0 ? newCdWidth + 'px' : 0; 
+        cd.style.opacity = newCdWidth / cdWidth
+        const newbackgroundBlur = backgroundBlurWidth - scrollTop
+        backgroundBlur.style.height = newbackgroundBlur > 0 ? newbackgroundBlur + 86 + 'px' : 0; 
+        console.log(backgroundBlur.style.height)
+
+        const newbackgroundBlack = backgroundBlackWidth - scrollTop
+        backgroundBlack.style.height = newbackgroundBlack > 0 ? newbackgroundBlack + 86 + 'px' : 0;
+        // if(cd.style.width = 0 + 'px')
+        // {
+        //     return
+        // }
+    }
+    
 }
 
 // const app = {
