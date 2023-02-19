@@ -24,3 +24,6 @@ body{
 .info{
     max-width: 302px;;
 }
+ul{
+    list-style: none;
+}

@@ -1,5 +1,35 @@
 const jsmediatags = window.jsmediatags;
+var btnNext = document.querySelector('.btn-next')
+var btnPrev = document.querySelector('.btn-prev')
 
+function getIndexSong(arrSong,i){
+    var arrGetIndex = []
+    arrGetIndex=arrSong
+    var i = 0
+
+    btnNext.onclick = function(){
+        i++
+        if(i>arrGetIndex.length)
+        {
+            return i=0
+        }
+        currentSong(arrGetIndex[i-1])
+    }
+    btnPrev.onclick = function(){
+        i-- 
+        currentSong(arrGetIndex[i+1])
+    }
+}
+
+function currentSong(current){
+    var heading = document.querySelector('header h2')
+    var cdThumb = document.querySelector('.cd-thumb')
+    var audio = document.querySelector('#audio')
+    console.log(heading,cdThumb,audio)
+
+    heading.textContent = current.title
+    cdThumb.style.backgroundImage =  current.cover
+}
 function parseMp3Metadata(files) {
     var parseMp3Metadata = []
     files.map(function(file){ //parse Metadata
@@ -22,15 +52,13 @@ function parseMp3Metadata(files) {
                     } 
                     parseMp3Metadata.splice(0,0,arrs)  
                     renderMetadata(parseMp3Metadata)
-                    defineProperties(parseMp3Metadata)
-                      
+                    getIndexSong(parseMp3Metadata)              
             },
             onError: function (error) {
                 console.log(error)
             }
         })
     })
-    
     // console.log(parseMp3Metadata)
 }
 function renderMetadata(metadataFiles){
@@ -49,7 +77,8 @@ function renderMetadata(metadataFiles){
 function start(){
     whenYouInputFile()
     handleEvents()
-    defineProperties()
+    currentSong()
+    
 }
 start()
 
@@ -69,15 +98,6 @@ function whenYouInputFile(){
     })
 }
 // End parseMp3, render playList 
-var currentIndex = 0
-function defineProperties(cc){
-    Object.defineProperty(cc,'CurrentSong',{
-        configurable: true,
-        get(){
-            return cc[currentIndex]
-        }
-    })
-}
 function handleEvents(){
     const cd = document.querySelector('.cd')
         const cdWidth = cd.offsetWidth 
