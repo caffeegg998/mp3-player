@@ -2,51 +2,47 @@ const jsmediatags = window.jsmediatags;
 var btnNext = document.querySelector('.btn-next')
 var btnPrev = document.querySelector('.btn-prev')
 
-function getIndexSong(arrSong,i){
+function getIndexSong(arrSong, i) {
     var arrGetIndex = []
-    setTimeout(function(){
-        arrGetIndex=arrSong
+    setTimeout(function () {
+        arrGetIndex = arrSong
         console.log(arrGetIndex)
-    },2000)
+    }, 2000)
     console.log(arrGetIndex)
     var i = 0
 
-    btnNext.onclick = function(){
+    btnNext.onclick = function () {
         i++
-        if(i>arrGetIndex.length)
-        {
-            return i=0
+        if (i > arrGetIndex.length) {
+            return i = 0
         }
         currentSong(arrGetIndex[i])
-        console.log(i)
     }
-    btnPrev.onclick = function(){
-        i-- 
-        if(i<0)
-        {
-            i = arrGetIndex.length -1
+    btnPrev.onclick = function () {
+        --i
+        if (i < 0) {
+            i = arrGetIndex.length - 1
         }
         currentSong(arrGetIndex[i])
-        console.log(i)
     }
 }
 
-function currentSong(current){
+function currentSong(current) {
     var heading = document.querySelector('header h2')
     var cdThumb = document.querySelector('.cd-thumb')
     var backgroundImage = document.querySelector('.dashboard-blur')
     var audio = document.querySelector('#audio')
-    console.log(heading,cdThumb,audio)
+    console.log(heading, cdThumb, audio)
     backgroundImage.style.backgroundImage = current.cover
     heading.textContent = current.title
-    cdThumb.style.backgroundImage =  current.cover
+    cdThumb.style.backgroundImage = current.cover
 }
 function parseMp3Metadata(files) {
     var parseMp3Metadata = []
-    files.map(function(file){ //parse Metadata
+    files.map(function (file) { //parse Metadata
         jsmediatags.read(file, {
             onSuccess: function (tag) {
-                
+
                 var data = tag.tags.picture.data;
                 var format = tag.tags.picture.format;
                 var base64String = "";
@@ -54,16 +50,16 @@ function parseMp3Metadata(files) {
                     base64String += String.fromCharCode(data[i])
                 }
                 var arrs =
-                    {
-                        title : tag.tags.title,
-                        artist : tag.tags.artist,
-                        album : tag.tags.album,
-                        genre : tag.tags.genre,
-                        cover : `url(data:${format};base64,${window.btoa(base64String)})`
-                    } 
-                    parseMp3Metadata.splice(0,0,arrs)  
-                    renderMetadata(parseMp3Metadata)
-                    getIndexSong(parseMp3Metadata)              
+                {
+                    title: tag.tags.title,
+                    artist: tag.tags.artist,
+                    album: tag.tags.album,
+                    genre: tag.tags.genre,
+                    cover: `url(data:${format};base64,${window.btoa(base64String)})`
+                }
+                parseMp3Metadata.push(arrs)
+                renderMetadata(parseMp3Metadata)
+                getIndexSong(parseMp3Metadata)
             },
             onError: function (error) {
                 console.log(error)
@@ -72,10 +68,10 @@ function parseMp3Metadata(files) {
     })
     // console.log(parseMp3Metadata)
 }
-function renderMetadata(metadataFiles){
+function renderMetadata(metadataFiles) {
     console.log(metadataFiles)
     var renderItem = document.querySelector('.playlist')
-    var render = metadataFiles.map(function(file){
+    var render = metadataFiles.map(function (file) {
         return `<div class="song">
         <div class="thumb" style="background-image: ${file.cover}"></div>
         <div class="body"><h3 class="title">${file.title}</h3><p class="author">${file.artist}</p></div>
@@ -85,48 +81,49 @@ function renderMetadata(metadataFiles){
     // console.log(render)
     renderItem.innerHTML = render.join('')
 }
-function start(){
+function start() {
     whenYouInputFile()
     handleEvents()
     currentSong()
-    
+
 }
 start()
 
-function whenYouInputFile(){
+function whenYouInputFile() {
     document.querySelectorAll("input")[1].addEventListener("change", (event) => {
         const file = event.target.files;
         const arrFile = []
-        for(var i = 0;i<file.length;i++)
-        {
+        const arrBlob = []
+        for (var i = 0; i < file.length; i++) {
             arrFile.push(file[i])
             var path = (window.URL || window.webkitURL).createObjectURL(file[i]);
-            console.log('path', path);
-        }   
-        
+            arrBlob.push(path)
+        }
+
         console.log(arrFile)
         parseMp3Metadata(arrFile)
+        bufferFile(arrBlob)
     })
 }
 // End parseMp3, render playList 
-function handleEvents(){
+function handleEvents() {
     const cd = document.querySelector('.cd')
     const backgroundBlur = document.querySelector('.dashboard-blur')
     const backgroundBlack = document.querySelector('.dashboard-black')
-    const cdWidth = cd.offsetWidth 
-    const backgroundBlurWidth = backgroundBlur.offsetWidth 
-    const backgroundBlackWidth = backgroundBlack.offsetWidth 
-    
-    document.onscroll = function(){
+    const cdWidth = cd.offsetWidth
+    const backgroundBlurWidth = backgroundBlur.offsetWidth
+    const backgroundBlackWidth = backgroundBlack.offsetWidth
+
+    document.onscroll = function () {
         const scrollTop = window.scrollY || document.documentElement.scrollTop
-        
+
         // console.log("scroll: ",scrollTop)
-        
+
         const newCdWidth = cdWidth - scrollTop
-        cd.style.width = newCdWidth > 0 ? newCdWidth + 'px' : 0; 
+        cd.style.width = newCdWidth > 0 ? newCdWidth + 'px' : 0;
         cd.style.opacity = newCdWidth / cdWidth
         const newbackgroundBlur = backgroundBlurWidth - scrollTop
-        backgroundBlur.style.height = newbackgroundBlur > 0 ? newbackgroundBlur + 86 + 'px' : 0; 
+        backgroundBlur.style.height = newbackgroundBlur > 0 ? newbackgroundBlur + 86 + 'px' : 0;
         console.log(backgroundBlur.style.height)
 
         const newbackgroundBlack = backgroundBlackWidth - scrollTop
@@ -136,9 +133,87 @@ function handleEvents(){
         //     return
         // }
     }
-    
+
 }
 
-// const app = {
-//     song:
-// }
+// Buffer file
+
+function bufferFile(samplePaths) {
+    let audioContext;
+    let samples;
+    var sampleSource = null
+    const startCtxBtn = document.querySelector(".start")
+    const setupSamplesBtn = document.querySelector(".setup-samples")
+    const playSamplesBtn = document.querySelector(".play-samples")
+    const playBtn = document.querySelector(".btn-toggle-play")
+    startCtxBtn.addEventListener("click", () => {
+        audioContext = new AudioContext();
+        console.log("Audio Context Started");
+    });
+
+    setupSamplesBtn.addEventListener("click", () => {
+        setupSamples(samplePaths).then((response) => {
+            samples = response
+            console.log(samples)
+            var i = 0   
+            btnNext.addEventListener("click", () => {
+                stopSample()
+                i++
+                if (i > samples.length) {
+                    return i = 0
+                }
+                playSample(samples[i], 1)
+            })
+            btnPrev.addEventListener("click", () => {
+                stopSample()
+                i--
+                if (i < 0) {
+                    i = samples.length - 1
+                }
+                playSample(samples[i], 1)
+            })
+        })
+    })
+
+    async function getFile(filePath) {
+        const response = await fetch(filePath);
+        const arrayBuffer = await response.arrayBuffer();
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        return audioBuffer;
+    }
+
+    async function setupSamples(paths) {
+        console.log("Setting up samples")
+        const audioBuffers = []
+
+        for (var i = 0; i < paths.length; i++) {
+            var sample = await getFile(paths[i])
+            console.log(sample)
+            audioBuffers.push(sample)
+        }
+        console.log("Setting up done")
+        return audioBuffers;
+    }
+
+    function playSample(audioBuffer, time) {
+        sampleSource = audioContext.createBufferSource();
+        sampleSource.buffer = audioBuffer;
+        sampleSource.connect(audioContext.destination);
+        sampleSource.start(time)
+    }
+    function stopSample() {
+        if (sampleSource) {
+            sampleSource.stop()
+        }
+    }
+    function play(){
+        if (sampleSource) {
+            sampleSource.start()
+        }
+    }
+
+
+
+
+
+}
