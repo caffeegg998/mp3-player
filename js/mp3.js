@@ -1,7 +1,10 @@
 const jsmediatags = window.jsmediatags;
 var btnNext = document.querySelector('.btn-next')
 var btnPrev = document.querySelector('.btn-prev')
-
+var togglePlayPause = document.querySelector('.player')
+var progress = document.querySelector('#progress')
+audioContext = new AudioContext();
+// Hàm xử lí sự kiện chuyển bài và in ra metadata tương ứng
 function getIndexSong(arrSong, i) {
     var arrGetIndex = []
     setTimeout(function () {
@@ -26,17 +29,22 @@ function getIndexSong(arrSong, i) {
         currentSong(arrGetIndex[i])
     }
 }
-
+// hàm trả về metadata và in ra metadata cho dashboard
 function currentSong(current) {
     var heading = document.querySelector('header h2')
     var cdThumb = document.querySelector('.cd-thumb')
     var backgroundImage = document.querySelector('.dashboard-blur')
-    var audio = document.querySelector('#audio')
     console.log(heading, cdThumb, audio)
     backgroundImage.style.backgroundImage = current.cover
     heading.textContent = current.title
     cdThumb.style.backgroundImage = current.cover
 }
+function audioBuffLoad(load){
+    var audio = document.querySelector('#audio')
+    audio.src = load.duration
+    console.log(audio)
+}
+// Hàm lấy metadata từ file mp3
 function parseMp3Metadata(files) {
     var parseMp3Metadata = []
     files.map(function (file) { //parse Metadata
@@ -68,6 +76,7 @@ function parseMp3Metadata(files) {
     })
     // console.log(parseMp3Metadata)
 }
+// Hàm render ra metadata vào playlistplaylist file Mp3
 function renderMetadata(metadataFiles) {
     console.log(metadataFiles)
     var renderItem = document.querySelector('.playlist')
@@ -81,6 +90,7 @@ function renderMetadata(metadataFiles) {
     // console.log(render)
     renderItem.innerHTML = render.join('')
 }
+// Hàm khởi động
 function start() {
     whenYouInputFile()
     handleEvents()
@@ -88,7 +98,7 @@ function start() {
 
 }
 start()
-
+// Hàm xử lý file đầu vào
 function whenYouInputFile() {
     document.querySelectorAll("input")[1].addEventListener("change", (event) => {
         const file = event.target.files;
@@ -137,15 +147,14 @@ function handleEvents() {
 }
 
 // Buffer file
-
+// Hàm này tôi truyền vào tham số là các file nhạc đã convert sang dạng Blob
 function bufferFile(samplePaths) {
     let audioContext;
     let samples;
     var sampleSource = null
     const startCtxBtn = document.querySelector(".start")
     const setupSamplesBtn = document.querySelector(".setup-samples")
-    const playSamplesBtn = document.querySelector(".play-samples")
-    const playBtn = document.querySelector(".btn-toggle-play")
+    const playPauseBtn = document.querySelector(".btn-toggle-play")
     startCtxBtn.addEventListener("click", () => {
         audioContext = new AudioContext();
         console.log("Audio Context Started");
@@ -156,6 +165,13 @@ function bufferFile(samplePaths) {
             samples = response
             console.log(samples)
             var i = 0   
+            
+            // Play/Pause Event
+            playPauseBtn.addEventListener("click", () => {
+                pausePlay()
+                
+            })
+            // Next Event
             btnNext.addEventListener("click", () => {
                 stopSample()
                 i++
@@ -163,7 +179,9 @@ function bufferFile(samplePaths) {
                     return i = 0
                 }
                 playSample(samples[i], 1)
+                
             })
+            // Prev Event
             btnPrev.addEventListener("click", () => {
                 stopSample()
                 i--
@@ -171,10 +189,12 @@ function bufferFile(samplePaths) {
                     i = samples.length - 1
                 }
                 playSample(samples[i], 1)
+                audioBuffLoad(samples[i])
             })
+            
         })
     })
-
+    // convert file to audioBuffer and return file
     async function getFile(filePath) {
         const response = await fetch(filePath);
         const arrayBuffer = await response.arrayBuffer();
@@ -182,6 +202,7 @@ function bufferFile(samplePaths) {
         return audioBuffer;
     }
 
+    // Lấy từng file ra đưa vào hàm getFile để xử lý
     async function setupSamples(paths) {
         console.log("Setting up samples")
         const audioBuffers = []
@@ -189,31 +210,43 @@ function bufferFile(samplePaths) {
         for (var i = 0; i < paths.length; i++) {
             var sample = await getFile(paths[i])
             console.log(sample)
-            audioBuffers.push(sample)
+            audioBuffers.push(sample)  // sau khi sử lý file xong, file được trả về sẽ đc thêm vào mảng audioBuffers
         }
         console.log("Setting up done")
         return audioBuffers;
     }
-
+    // Hàm play file audioBuffer
     function playSample(audioBuffer, time) {
         sampleSource = audioContext.createBufferSource();
         sampleSource.buffer = audioBuffer;
         sampleSource.connect(audioContext.destination);
         sampleSource.start(time)
+        progress.onchange = function(e){
+            const seekTime =    audioBuffer.duration / 100 * e.target.value
+            console.log("seek: ",seekTime)
+            //audioContext.destination.context.currentTime = seekTime
+            console.log(sampleSource)
+        }
+        
     }
+    // Hàm này để dừng bài nhạc đang phát. Tôi gọi hàm này khi ấn Next bài tiếp theo
     function stopSample() {
         if (sampleSource) {
             sampleSource.stop()
         }
     }
-    function play(){
-        if (sampleSource) {
-            sampleSource.start()
-        }
+    // Hàm này làm cho nút play/pause 
+    function pausePlay(){
+        if(audioContext.state === 'running') {
+            audioContext.suspend().then(function() {
+                togglePlayPause.classList.remove('playing');
+            });
+          }else if(audioContext.state === 'suspended') {
+            audioContext.resume().then(function() {
+                togglePlayPause.classList.add('playing');;
+            });  
+          }
+          console.log(togglePlayPause)
     }
-
-
-
-
-
 }
+

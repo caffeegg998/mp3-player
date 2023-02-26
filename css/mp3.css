@@ -26,14 +26,20 @@
   
   .player .icon-pause {
     display: none;
+    
+    z-index: 99999;
   }
   
   .player.playing .icon-pause {
     display: inline-block;
+    
+    z-index: 99999;
   }
   
   .player.playing .icon-play {
     display: none;
+    
+    z-index: 99999;
   }
   
   .dashboard {
