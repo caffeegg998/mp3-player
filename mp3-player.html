@@ -13,6 +13,7 @@
     <title>Music player</title>
 </head>
 <body>
+    <audio id="music-player"></audio>
     <div class="player playing">
         <!-- Dashboard -->
         <div class="dashboard">
@@ -32,6 +33,7 @@
             </div>
 
             <!-- Control -->
+            
             <div class="control">
                 <div class="btn btn-repeat">
                     <i class="fas fa-redo"></i>
@@ -62,7 +64,7 @@
         </div>
         <!-- Input  -->
         <div>
-            <label class="upload"
+            <label class="music-file"
                 >Upload:<span>  </span><input type="file" id="input" accept=".mp3" multiple="multiple">
             </label>
             
@@ -70,11 +72,7 @@
         <!-- test  -->
         
     </div>
-    <div>
-        <button class="start">Setup Audio Context</button>
-        <button class="setup-samples">Setup Samples</button>
-        <button class="play-samples">Play Samples</button>
-    </div>
+    
     <!-- jsmediatags -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
     <script src="./js/mp3.js"></script>
